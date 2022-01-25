@@ -9,9 +9,8 @@ using travellersApi.Entities;
 
 namespace travellersApi.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class TravellersController : ControllerBase
+
+    public class TravellersController : BaseApiController
     {
         private readonly DataContext _context;
         public TravellersController(DataContext context)
