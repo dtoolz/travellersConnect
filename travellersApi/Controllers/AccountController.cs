@@ -33,6 +33,21 @@ namespace travellersApi.Controllers
             await _context.SaveChangesAsync();
             return traveller;
         }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<AppTraveller>> Login (LoginDto loginDto){
+           var traveller = await _context.Travellers.SingleOrDefaultAsync(result => result.UserName == loginDto.Username);
+           if ( traveller == null ) return Unauthorized("Username is invalid!");
+
+           using var hmac = new HMACSHA512(traveller.PasswordSalt);
+           var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
+
+           for ( int i = 0; i < computedHash.Length; i++ ) {
+                if ( computedHash[i] != traveller.PasswordHash[i]) return Unauthorized("Invalid Password");
+           }
+           return traveller;
+        }
+
         private async Task<bool> TravellerExists(string username){
             return await _context.Travellers.AnyAsync(result => result.UserName == username.ToLower());
         }
