@@ -9,18 +9,21 @@ using Microsoft.EntityFrameworkCore;
 using travellersApi.Data;
 using travellersApi.DTOs;
 using travellersApi.Entities;
+using travellersApi.Interfaces;
 
 namespace travellersApi.Controllers
 {
     public class AccountController : BaseApiController
     {
         private readonly DataContext _context;
-        public AccountController(DataContext context)
+        private readonly ITokenService _tokenService;
+        public AccountController(DataContext context, ITokenService tokenService)
         {
+            _tokenService = tokenService;
             _context = context;
         }
         [HttpPost("register")]
-        public async Task<ActionResult<AppTraveller>> Register(RegisterDto registerDto){
+        public async Task<ActionResult<TravellerDto>> Register(RegisterDto registerDto){
            if( await TravellerExists(registerDto.Username)) return BadRequest("Username is Taken!");
 
             using var hmac = new HMACSHA512();
@@ -31,11 +34,14 @@ namespace travellersApi.Controllers
             };
             _context.Travellers.Add(traveller);
             await _context.SaveChangesAsync();
-            return traveller;
+            return new TravellerDto{
+                Username = traveller.UserName,
+                Token = _tokenService.CreateToken(traveller)
+            };
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<AppTraveller>> Login (LoginDto loginDto){
+        public async Task<ActionResult<TravellerDto>> Login (LoginDto loginDto){
            var traveller = await _context.Travellers.SingleOrDefaultAsync(result => result.UserName == loginDto.Username);
            if ( traveller == null ) return Unauthorized("Username is invalid!");
 
@@ -45,7 +51,10 @@ namespace travellersApi.Controllers
            for ( int i = 0; i < computedHash.Length; i++ ) {
                 if ( computedHash[i] != traveller.PasswordHash[i]) return Unauthorized("Invalid Password");
            }
-           return traveller;
+           return new TravellerDto{
+                Username = traveller.UserName,
+                Token = _tokenService.CreateToken(traveller)
+            };
         }
 
         private async Task<bool> TravellerExists(string username){
