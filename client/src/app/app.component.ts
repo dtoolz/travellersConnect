@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+/* import { HttpClient } from '@angular/common/http'; */
 import { Component, OnInit } from '@angular/core';
 import { Traveller } from './_models/traveller';
 import { AccountService } from './_services/account.service';
@@ -12,10 +12,10 @@ export class AppComponent implements OnInit {
   //title = "travellers connect";
   travellers: any;
 
-  constructor(private http:HttpClient, private accountService: AccountService){}
+  constructor(/* private http:HttpClient, */ private accountService: AccountService){}
 
   ngOnInit() {
-   this.getTravellers();
+  // this.getTravellers();
    this.setCurrentTraveller();
   }
 
@@ -24,11 +24,11 @@ export class AppComponent implements OnInit {
     this.accountService.setCurrentTraveller(traveller);
   }
 
-  getTravellers (){
+ /*  getTravellers (){
     this.http.get('https://localhost:5001/api/travellers').subscribe(response => {
       this.travellers = response;
     }, error => {
       console.log(error);
     });
-  }
+  } */
 }

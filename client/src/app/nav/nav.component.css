@@ -1,3 +1,7 @@
 .dropdown-toggle, .dropdown-item {
   cursor: pointer;
 }
+
+.custom-white {
+  color: rgb(212, 212, 212) !important;
+}

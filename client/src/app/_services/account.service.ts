@@ -30,6 +30,17 @@ export class AccountService {
     this.currentTravellerSource.next(traveller);
   }
 
+  register (model: any) {
+    return this.http.post(this.baseUrl + 'account/register', model).pipe(
+      map((traveller: Traveller) => {
+         if(traveller) {
+           localStorage.setItem('traveller', JSON.stringify(traveller));
+           this.currentTravellerSource.next(traveller);
+         }
+      })
+    )
+  }
+
   logout(){
     localStorage.removeItem('traveller');
     this.currentTravellerSource.next(null);
